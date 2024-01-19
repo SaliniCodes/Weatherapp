@@ -14,8 +14,10 @@ class Weather extends StatefulWidget {
 
 class _WeatherState extends State<Weather> {
   WeatherModel? weather  ;
-  Future<void> fetchData() async {
-    final url = Uri.parse('http://api.weatherapi.com/v1/current.json?key=02670d17832043db80c63727241701&q=kochi');
+  TextEditingController messageController = TextEditingController();
+
+  Future<void> fetchData(String Location) async {
+    final url = Uri.parse('http://api.weatherapi.com/v1/current.json?key=02670d17832043db80c63727241701&q=$Location');
 
     final response = await http.get(url);
 
@@ -31,7 +33,7 @@ class _WeatherState extends State<Weather> {
   }
   @override
   void initState() {
-    fetchData();
+    fetchData("kochi");
     // TODO: implement initState
     super.initState();
   }
@@ -40,7 +42,7 @@ class _WeatherState extends State<Weather> {
     return SafeArea(
         child: Scaffold(body:weather==null?Center(child: CircularProgressIndicator()):Container(decoration: BoxDecoration(
           image: DecorationImage(
-            image: NetworkImage('https://images.unsplash.com/photo-1563630381190-77c336ea545a?q=80&w=1378&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D'),
+            image: NetworkImage(''),
             fit: BoxFit.cover,
           ),
         ),child: Column(
@@ -54,21 +56,40 @@ class _WeatherState extends State<Weather> {
                       // Handle tapping the comment icon
                     },
                   ),
-
+                  Container(width: 200,
+                    child: TextField(
+                      controller: messageController,
+                      decoration: InputDecoration(
+                        labelText: 'Enter Location',
+                        border: OutlineInputBorder(),
+                      ),
+                    ),
+                  ),
+                  SizedBox(width: 100,),
+                  GestureDetector(onTap: () => fetchData(messageController.text),
+                      child:Container(height:20,width: 50,color:Colors.green,child: Text('Search'),),)
                 ],
               ),
             ),
             SizedBox(height:100),
             Text(weather!.location.name,style: GoogleFonts.lato(fontSize: 20,fontWeight:FontWeight.w900),
             ),
-            Text(weather!.current.lastUpdated,  style: GoogleFonts.lato(),
+            Text(weather!.current.lastUpdated.toString(),  style: GoogleFonts.lato(),
             ),
-            SizedBox(height:150),
+
+            SizedBox(height:100),
+
+            Container(height:40,width:40,decoration: BoxDecoration(
+              image: DecorationImage(
+                image: NetworkImage(weather!.current.condition.icon),
+                fit: BoxFit.cover,
+              ),
+            ),),
             Text(weather!.current.tempC.toString(),  style: GoogleFonts.lato(fontSize: 20,fontWeight:FontWeight.w900),
             ),
             Text('Good Night wasim',  style: GoogleFonts.lato(fontSize:10),
             ),
-            SizedBox(height: 100,),
+            SizedBox(height: 50,),
             Container(
               child: Row(mainAxisAlignment: MainAxisAlignment.spaceAround,
                 children: [Container(
@@ -103,6 +124,7 @@ class _WeatherState extends State<Weather> {
                   Container(
                     child: Column(
                       children: [
+
                         IconButton(
                           icon: Icon(Icons.cloud,size:30),
                           onPressed: () {
